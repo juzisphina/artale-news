@@ -7,7 +7,7 @@
 <meta name="description" content="Artale 台服官方公告的重點整理：改版更新、維護時間、活動與購物商場，自動同步。">
 <link rel="alternate" type="application/rss+xml" title="Artale 台服公告小整理" href="feed.xml">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍊</text></svg>">
-<link rel="stylesheet" href="style.css?v=5">
+<link rel="stylesheet" href="style.css?v=6">
 </head>
 <body>
 <header class="hero">
@@ -31,6 +31,7 @@
       <h1>Artale 台服公告小整理</h1>
       <p class="sub">改版更新・維護時間・活動・購物商場，一頁看重點 ✨</p>
       <p class="meta"><span id="updated">載入中…</span> ・ <a href="feed.xml">RSS 訂閱</a> ・ <a href="https://artale.live/tw/news" target="_blank" rel="noopener">官方公告</a></p>
+      <button id="aiBtn" class="ai-btn" type="button">✨ AI 白話設定</button>
     </div>
   </div>
 </header>
@@ -46,10 +47,29 @@
   <p id="empty" class="empty" hidden>找不到符合的公告 🥲</p>
 </main>
 
+<dialog id="aiDlg" class="dlg" aria-labelledby="aiTitle">
+  <h2 id="aiTitle">✨ AI 白話設定</h2>
+  <p>填入你自己的 <b>Google Gemini 金鑰</b>，還沒有白話整理的公告就能一鍵（或打開時自動）翻成人話。</p>
+  <label for="aiKey">Gemini API 金鑰</label>
+  <input id="aiKey" type="password" autocomplete="off" spellcheck="false" placeholder="AIza 開頭的一串字">
+  <p id="aiStatus" class="dlg-status"></p>
+  <ul class="dlg-notes">
+    <li>🔒 金鑰只存在<b>你這台裝置的瀏覽器</b>，只會傳給 Google，不會上傳到這個網站。</li>
+    <li>💡 每個人用自己的金鑰，整理結果也只存在自己的瀏覽器。</li>
+    <li>🔑 還沒有金鑰？到 <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">Google AI Studio</a> 免費申請。</li>
+  </ul>
+  <div class="dlg-actions">
+    <button id="aiClear" type="button" class="btn-ghost">清除金鑰</button>
+    <span class="grow"></span>
+    <button id="aiCancel" type="button" class="btn-ghost">取消</button>
+    <button id="aiSave" type="button" class="btn-main">儲存</button>
+  </div>
+</dialog>
+
 <footer class="foot">
   <p>🍊 非官方粉絲整理・每 30 分鐘自動同步・內容以 <a href="https://artale.live/tw/news" target="_blank" rel="noopener">官方公告</a> 為準</p>
   <p>Made with 🧡 by <a href="https://github.com/juzisphina">juzisphina</a></p>
 </footer>
-<script src="app.js?v=5"></script>
+<script src="app.js?v=6"></script>
 </body>
 </html>
