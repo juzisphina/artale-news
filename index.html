@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Artale 台服公告小整理 🍊</title>
+<meta name="description" content="Artale 台服官方公告的重點整理：改版更新、維護時間、活動與購物商場，自動同步。">
+<link rel="alternate" type="application/rss+xml" title="Artale 台服公告小整理" href="feed.xml">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍊</text></svg>">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="hero">
+  <div class="hero-inner">
+    <svg class="mascot" viewBox="0 0 120 120" aria-hidden="true">
+      <ellipse cx="60" cy="108" rx="34" ry="6" fill="#000" opacity=".08"/>
+      <circle cx="60" cy="66" r="40" fill="#FFA24C"/>
+      <circle cx="60" cy="66" r="40" fill="url(#shine)"/>
+      <path d="M60 28c-2-10 4-18 14-20-1 10-6 17-14 20z" fill="#7BC67E"/>
+      <path d="M58 28c0-6-2-10-6-12" stroke="#8D6E63" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <circle cx="46" cy="66" r="4.5" fill="#5D4037"/>
+      <circle cx="74" cy="66" r="4.5" fill="#5D4037"/>
+      <circle cx="47.5" cy="64.5" r="1.5" fill="#fff"/>
+      <circle cx="75.5" cy="64.5" r="1.5" fill="#fff"/>
+      <path d="M54 75q6 6 12 0" stroke="#5D4037" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <ellipse cx="38" cy="76" rx="6" ry="3.5" fill="#FF7A8A" opacity=".55"/>
+      <ellipse cx="82" cy="76" rx="6" ry="3.5" fill="#FF7A8A" opacity=".55"/>
+      <defs><radialGradient id="shine" cx=".35" cy=".3" r=".7"><stop offset="0" stop-color="#fff" stop-opacity=".45"/><stop offset=".5" stop-color="#fff" stop-opacity="0"/></radialGradient></defs>
+    </svg>
+    <div>
+      <h1>Artale 台服公告小整理</h1>
+      <p class="sub">改版更新・維護時間・活動・購物商場，一頁看重點 ✨</p>
+      <p class="meta"><span id="updated">載入中…</span> ・ <a href="feed.xml">RSS 訂閱</a> ・ <a href="https://artale.live/tw/news" target="_blank" rel="noopener">官方公告</a></p>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="highlights" id="highlights" aria-label="重點"></section>
+
+  <section class="toolbar" aria-label="篩選">
+    <div class="chips" id="chips" role="tablist"></div>
+    <input id="q" type="search" placeholder="搜尋公告…（例：技能書、維護）" aria-label="搜尋公告">
+  </section>
+
+  <section id="list" class="list" aria-live="polite"></section>
+  <p id="empty" class="empty" hidden>找不到符合的公告 🥲</p>
+</main>
+
+<footer class="foot">
+  <p>🍊 非官方粉絲整理・每 30 分鐘自動同步・內容以 <a href="https://artale.live/tw/news" target="_blank" rel="noopener">官方公告</a> 為準</p>
+  <p>Made with 🧡 by <a href="https://github.com/juzisphina">juzisphina</a></p>
+</footer>
+<script src="app.js"></script>
+</body>
+</html>
