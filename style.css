@@ -53,7 +53,7 @@ a { color: var(--accent); }
 
 .wrap { max-width: 920px; margin: 0 auto; padding: 20px 16px 40px; }
 
-.highlights { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; margin-top: -32px; }
+
 .hl {
   background: var(--card);
   border: 1px solid var(--line);
@@ -67,7 +67,7 @@ a { color: var(--accent); }
 .hl .when { font-size: 1.15rem; font-weight: 700; }
 .hl .small { font-size: .82rem; color: var(--soft); margin: 6px 0 0; }
 
-.toolbar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between; margin: 26px 0 12px; }
+.toolbar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between; margin: 4px 0 14px; }
 .chips { display: flex; flex-wrap: wrap; gap: 8px; }
 .chip {
   border: 1.5px solid var(--line);

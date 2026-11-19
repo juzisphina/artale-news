@@ -30,35 +30,6 @@
     } catch (e) { return iso; }
   }
 
-  function findSection(p, re) {
-    var s = (p.sections || []).filter(function (x) { return re.test(x.heading); });
-    return s[0];
-  }
-
-  function renderHighlights() {
-    var posts = state.posts, html = "";
-    var upd = posts.filter(function (p) { return p.category === "update" && /更新公告|改版|更新/.test(p.title) && p.sections && p.sections.length; })[0];
-    if (upd) {
-      var toc = findSection(upd, /目錄|目录|重點|摘要/) || upd.sections[0];
-      var items = toc.items.length ? toc.items : upd.sections.map(function (s) { return s.heading; });
-      var lis = upd.ai && upd.ai.points && upd.ai.points.length
-        ? upd.ai.points.map(function (pt) { return "<li>" + esc(pt.emoji) + " <b>" + esc(pt.title) + "</b>：" + esc(pt.text) + "</li>"; }).join("")
-        : items.slice(0, 8).map(function (i) { return "<li>" + esc(i) + "</li>"; }).join("");
-      html += '<article class="hl hl-wide">' + img(upd.cover, "hl-cover") + '<h2>🍊 最新改版重點</h2><p class="t">' + esc(upd.title) + "</p>" +
-        (upd.ai && upd.ai.tldr ? '<p class="tldr">💬 ' + esc(upd.ai.tldr) + "</p>" : "") + '<ul class="plain-list">' + lis +
-        '</ul><p class="small">' + esc(upd.posted || upd.date) + ' ・ <a href="' + esc(upd.url) + '" target="_blank" rel="noopener">原文</a></p></article>';
-    }
-    var mt = posts.filter(function (p) { return p.category === "maintenance" && findSection(p, /維護時間/); })[0];
-    if (mt) {
-      var time = findSection(mt, /維護時間/).items[0] || "";
-      var what = findSection(mt, /維護內容/);
-      html += '<article class="hl"><h2>🔧 最近一次維護</h2><p class="when">' + esc(time) + '</p><p class="t">' + esc(mt.title) + "</p>" +
-        (what ? "<ul>" + what.items.slice(0, 5).map(function (i) { return "<li>" + esc(i) + "</li>"; }).join("") + "</ul>" : "") +
-        '<p class="small"><a href="' + esc(mt.url) + '" target="_blank" rel="noopener">原文</a></p></article>';
-    }
-    $("highlights").innerHTML = html;
-  }
-
   function renderChips() {
     var counts = {};
     state.posts.forEach(function (p) { counts[p.category] = (counts[p.category] || 0) + 1; });
@@ -153,7 +124,7 @@
     .then(function (d) {
       state.posts = d.posts || [];
       $("updated").textContent = "最後同步：" + fmtTime(d.updated) + "（台灣時間）";
-      renderHighlights(); renderChips(); renderList();
+      renderChips(); renderList();
     })
     .catch(function () {
       $("updated").textContent = "資料載入失敗，請稍後再試";
