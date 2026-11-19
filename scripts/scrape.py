@@ -239,6 +239,7 @@ def main():
                     print("ai ok:", p["title"])
                 except Exception as e:
                     print(f"ai failed {p['id']}: {e}", file=sys.stderr)
+                    ai_budget = 0  # don't hammer the API when it's down / rate limited
         except Exception as e:
             print(f"detail failed {p['id']}: {e}", file=sys.stderr)
             if prev:

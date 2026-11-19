@@ -1,6 +1,7 @@
 """Plain-language summary of one announcement via GitHub Models (free, uses the Actions token)."""
 import json
 import os
+import urllib.error
 import urllib.request
 
 URL = "https://models.github.ai/inference/chat/completions"
@@ -39,9 +40,18 @@ def summarize(title, text, n_images, token):
         "Content-Type": "application/json",
         "Accept": "application/json",
     })
-    with urllib.request.urlopen(req, timeout=90) as r:
-        res = json.load(r)
-    out = json.loads(res["choices"][0]["message"]["content"])
+    try:
+        with urllib.request.urlopen(req, timeout=90) as r:
+            raw = r.read().decode("utf-8", "replace")
+    except urllib.error.HTTPError as e:
+        raise RuntimeError(f"HTTP {e.code}: {e.read()[:300]!r}")
+    try:
+        content = json.loads(raw)["choices"][0]["message"]["content"].strip()
+        if content.startswith("```"):
+            content = content.strip("`").removeprefix("json").strip()
+        out = json.loads(content)
+    except Exception:
+        raise RuntimeError(f"bad response: {raw[:400]!r}")
     # sanitize
     pts = []
     for p in (out.get("points") or [])[:5]:
