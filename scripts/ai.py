@@ -1,11 +1,12 @@
-"""Plain-language summary of one announcement via GitHub Models (free, uses the Actions token)."""
+"""Plain-language summary of one announcement via Google Gemini (free tier, key in GEMINI_API_KEY)."""
 import json
 import os
 import urllib.error
 import urllib.request
 
-URL = "https://models.github.ai/inference/chat/completions"
-MODEL = os.environ.get("AI_MODEL", "openai/gpt-4.1-mini")
+BASE = "https://generativelanguage.googleapis.com/v1beta/models/"
+MODELS = [os.environ.get("GEMINI_MODEL", "gemini-2.5-flash"), "gemini-2.5-flash-lite"]
+MODEL = MODELS[0]
 
 SYSTEM = """你是 Artale 台服的老玩家，幫朋友把官方公告「翻成人話」。
 規則：
@@ -26,32 +27,39 @@ SYSTEM = """你是 Artale 台服的老玩家，幫朋友把官方公告「翻成
 points 3~5 個，依重要性排序。維護公告的第一點一定要寫維護時間。"""
 
 
-def summarize(title, text, n_images, token):
-    user = f"公告標題：{title}\n圖片數量：{n_images}\n\n公告內容：\n{text[:9000]}"
+def call_gemini(model, system, user, key):
     body = json.dumps({
-        "model": MODEL,
-        "temperature": 0.3,
-        "response_format": {"type": "json_object"},
-        "messages": [{"role": "system", "content": SYSTEM},
-                     {"role": "user", "content": user}],
+        "systemInstruction": {"parts": [{"text": system}]},
+        "contents": [{"role": "user", "parts": [{"text": user}]}],
+        "generationConfig": {"temperature": 0.3, "responseMimeType": "application/json"},
     }).encode()
-    req = urllib.request.Request(URL, data=body, headers={
-        "Authorization": "Bearer " + token,
-        "Content-Type": "application/json",
-        "Accept": "application/json",
-    })
+    req = urllib.request.Request(BASE + model + ":generateContent", data=body, headers={
+        "x-goog-api-key": key, "Content-Type": "application/json"})
     try:
         with urllib.request.urlopen(req, timeout=90) as r:
             raw = r.read().decode("utf-8", "replace")
     except urllib.error.HTTPError as e:
-        raise RuntimeError(f"HTTP {e.code}: {e.read()[:300]!r}")
+        raise RuntimeError(f"{model} HTTP {e.code}: {e.read()[:300]!r}")
     try:
-        content = json.loads(raw)["choices"][0]["message"]["content"].strip()
+        content = json.loads(raw)["candidates"][0]["content"]["parts"][0]["text"].strip()
         if content.startswith("```"):
             content = content.strip("`").removeprefix("json").strip()
-        out = json.loads(content)
+        return json.loads(content)
     except Exception:
-        raise RuntimeError(f"bad response: {raw[:400]!r}")
+        raise RuntimeError(f"{model} bad response: {raw[:400]!r}")
+
+
+def summarize(title, text, n_images, key):
+    user = f"公告標題：{title}\n圖片數量：{n_images}\n\n公告內容：\n{text[:12000]}"
+    err = None
+    for model in dict.fromkeys(MODELS):
+        try:
+            out = call_gemini(model, SYSTEM, user, key)
+            break
+        except Exception as e:
+            err = e
+    else:
+        raise err
     # sanitize
     pts = []
     for p in (out.get("points") or [])[:5]:
@@ -64,4 +72,4 @@ def summarize(title, text, n_images, token):
     return {"tldr": str(out.get("tldr") or "")[:60],
             "points": pts,
             "todo": [str(t)[:80] for t in (out.get("todo") or [])][:3],
-            "model": MODEL}
+            "model": model}

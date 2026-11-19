@@ -106,7 +106,7 @@
     if (a.todo && a.todo.length) {
       h += '<div class="todo"><p class="plain-h">✅ 記得做</p><ul>' + a.todo.map(function (t) { return "<li>" + esc(t) + "</li>"; }).join("") + "</ul></div>";
     }
-    return h + '<p class="ai-note">AI 白話整理，日期與細節請以官方原文為準</p></div>';
+    return h + '<p class="ai-note">白話整理僅供參考，日期與細節請以官方原文為準</p></div>';
   }
 
   function postHtml(p) {
@@ -122,7 +122,7 @@
       (p.pinned ? '<span class="pin">📌 置頂</span>' : "") +
       (isNew(p) ? '<span class="new">NEW</span>' : "") +
       "<span>" + esc(p.posted || p.date) + '</span></span><span class="title">' + esc(p.title) + "</span>" + tldr + "</span>" +
-      img(p.cover, "thumb") + "</summary>" +
+      "</summary>" +
       '<div class="body">' + (p.cover ? img(p.cover, "cover") : "") + body +
       '<a class="src" href="' + esc(p.url) + '" target="_blank" rel="noopener">閱讀官方原文 →</a></div></details>';
   }

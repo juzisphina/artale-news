@@ -8,7 +8,6 @@ on:
 permissions:
   contents: write
   issues: write
-  models: read
 
 concurrency:
   group: scrape
@@ -25,7 +24,7 @@ jobs:
           python-version: "3.12"
       - name: Fetch announcements (+ plain-language AI summary)
         env:
-          GITHUB_TOKEN: ${{ github.token }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: python scripts/scrape.py
       - name: Commit if changed
         run: |

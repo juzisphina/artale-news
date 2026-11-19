@@ -19,7 +19,7 @@ OUT = os.path.join(ROOT, "data", "news.json")
 LIST_PAGES = 2          # newest ~20 posts per run
 KEEP = 120              # posts kept in the archive
 SCHEMA = 2              # bump to re-fetch every post after a format change
-AI_PER_RUN = 12         # GitHub Models free tier is rate limited; backfill slowly
+AI_PER_RUN = 8          # Gemini free tier is rate limited; backfill slowly
 NO_AI = {"sanction"}    # weekly ban lists: nothing to explain
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -213,7 +213,7 @@ def main():
     if not fresh:
         sys.exit("No posts parsed - site layout may have changed.")
 
-    token = os.environ.get("GITHUB_TOKEN", "")
+    token = os.environ.get("GEMINI_API_KEY", "")
     ai_budget = AI_PER_RUN if token else 0
     merged = dict(old)
     changed = 0

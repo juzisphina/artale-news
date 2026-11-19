@@ -6,6 +6,7 @@
 
 - 每 30 分鐘自動同步一次（GitHub Actions）
 - 有新公告時會自動開一個 Issue，GitHub 會通知你（Email / App）
+- 每篇公告有「說人話重點」＋官方配圖；新公告由 Gemini 自動整理（需在 repo Secrets 設定 `GEMINI_API_KEY`）
 - 也可以用 RSS 訂閱：[feed.xml](https://juzisphina.github.io/artale-news/feed.xml)
 
 > 非官方粉絲整理，內容以官方公告為準。
