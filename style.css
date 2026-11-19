@@ -133,7 +133,7 @@ a { color: var(--accent); }
 .pt { background: var(--hl, #FFF1E3); border-radius: 14px; padding: 10px 14px; margin: 8px 0; }
 .pt p { margin: 2px 0; }
 .pt .em { margin-right: 6px; }
-.pt .pic { margin-top: 8px; }
+.pt .pic { margin: 8px 0 2px; max-width: min(100%, 520px); }
 .todo ul { margin: 0; padding-left: 1.2em; }
 .ai-note { font-size: .78rem; color: var(--soft); margin: 10px 0 0; }
 .full { margin-top: 14px; border-top: 1px dashed var(--line); padding-top: 10px; }
