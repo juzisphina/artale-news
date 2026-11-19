@@ -14,6 +14,16 @@ SKIP = {"sanction"}  # weekly ban lists are noise for alerts
 
 def body(p):
     lines = [f"**{p['label']}** ・ {p.get('posted') or p['date']}", ""]
+    if p.get("cover"):
+        lines += [f"<img src=\"{p['cover']}\" width=\"480\">", ""]
+    a = p.get("ai")
+    if a and a.get("points"):
+        lines += [f"> 💬 {a['tldr']}", ""]
+        lines += [f"- {x['emoji']} **{x['title']}**：{x['text']}" for x in a["points"]]
+        if a.get("todo"):
+            lines += ["", "**✅ 記得做**"] + [f"- [ ] {t}" for t in a["todo"]]
+        lines += ["", f"🔗 [官方原文]({p['url']}) ・ 🍊 [公告小整理]({SITE})"]
+        return "\n".join(lines)
     lines += p.get("intro") or []
     for s in p.get("sections") or []:
         if s["heading"]:

@@ -41,8 +41,11 @@
     if (upd) {
       var toc = findSection(upd, /目錄|目录|重點|摘要/) || upd.sections[0];
       var items = toc.items.length ? toc.items : upd.sections.map(function (s) { return s.heading; });
-      html += '<article class="hl"><h2>🍊 最新改版重點</h2><p class="t">' + esc(upd.title) + "</p><ul>" +
-        items.slice(0, 8).map(function (i) { return "<li>" + esc(i) + "</li>"; }).join("") +
+      var lis = upd.ai && upd.ai.points && upd.ai.points.length
+        ? upd.ai.points.map(function (pt) { return "<li>" + esc(pt.emoji) + " <b>" + esc(pt.title) + "</b>：" + esc(pt.text) + "</li>"; }).join("")
+        : items.slice(0, 8).map(function (i) { return "<li>" + esc(i) + "</li>"; }).join("");
+      html += '<article class="hl hl-wide">' + img(upd.cover, "hl-cover") + '<h2>🍊 最新改版重點</h2><p class="t">' + esc(upd.title) + "</p>" +
+        (upd.ai && upd.ai.tldr ? '<p class="tldr">💬 ' + esc(upd.ai.tldr) + "</p>" : "") + '<ul class="plain-list">' + lis +
         '</ul><p class="small">' + esc(upd.posted || upd.date) + ' ・ <a href="' + esc(upd.url) + '" target="_blank" rel="noopener">原文</a></p></article>';
     }
     var mt = posts.filter(function (p) { return p.category === "maintenance" && findSection(p, /維護時間/); })[0];
@@ -66,26 +69,68 @@
     }).join("");
   }
 
-  function postHtml(p) {
-    var body = "";
-    if (p.intro && p.intro.length) body += '<p class="intro">' + p.intro.map(esc).join("<br>") + "</p>";
+  function img(src, cls) {
+    return src ? '<img class="' + (cls || "pic") + '" src="' + esc(src) + '" alt="" loading="lazy" decoding="async">' : "";
+  }
+
+  function tableHtml(rows) {
+    var head = rows[0], rest = rows.slice(1);
+    return '<div class="tbl"><table><thead><tr>' + head.map(function (c) { return "<th>" + esc(c) + "</th>"; }).join("") +
+      "</tr></thead><tbody>" + rest.map(function (r) {
+        return "<tr>" + r.map(function (c) { return "<td>" + esc(c) + "</td>"; }).join("") + "</tr>";
+      }).join("") + "</tbody></table></div>";
+  }
+
+  function sectionsHtml(p) {
+    var h = "";
+    if (p.intro && p.intro.length) h += '<p class="intro">' + p.intro.map(esc).join("<br>") + "</p>";
     (p.sections || []).forEach(function (s) {
-      if (s.heading) body += "<h3>" + esc(s.heading) + "</h3>";
-      if (s.items.length) body += "<ul>" + s.items.map(function (i) { return "<li>" + esc(i) + "</li>"; }).join("") + "</ul>";
+      if (s.heading) h += "<h3>" + esc(s.heading) + "</h3>";
+      if (s.items.length) h += "<ul>" + s.items.map(function (i) { return "<li>" + esc(i) + "</li>"; }).join("") + "</ul>";
+      (s.tables || []).forEach(function (t) { h += tableHtml(t); });
+      (s.images || []).forEach(function (u) { h += img(u); });
     });
-    if (!body) body = '<p class="intro">' + (p.category === "sanction" ? "制裁名單請看官方原文。" : "這篇公告的內容請看官方原文。") + "</p>";
-    return '<details class="post" style="--cat:' + catVar(p) + '"><summary><span class="row1">' +
+    return h;
+  }
+
+  function aiHtml(p) {
+    var a = p.ai, used = {};
+    if (!a || !a.points || !a.points.length) return "";
+    var h = '<div class="plain"><p class="plain-h">🍊 說人話重點</p>';
+    a.points.forEach(function (pt) {
+      var src = pt.img && p.images ? p.images[pt.img - 1] : "";
+      if (src && used[src]) src = "";
+      if (src) used[src] = 1;
+      h += '<div class="pt"><p><span class="em">' + esc(pt.emoji) + "</span><b>" + esc(pt.title) + "</b></p><p>" + esc(pt.text) + "</p>" + img(src) + "</div>";
+    });
+    if (a.todo && a.todo.length) {
+      h += '<div class="todo"><p class="plain-h">✅ 記得做</p><ul>' + a.todo.map(function (t) { return "<li>" + esc(t) + "</li>"; }).join("") + "</ul></div>";
+    }
+    return h + '<p class="ai-note">AI 白話整理，日期與細節請以官方原文為準</p></div>';
+  }
+
+  function postHtml(p) {
+    var plain = aiHtml(p), full = sectionsHtml(p), body;
+    if (plain) {
+      body = plain + (full ? '<details class="full"><summary>📄 看官方原文重點（含圖表）</summary>' + full + "</details>" : "");
+    } else {
+      body = full || '<p class="intro">' + (p.category === "sanction" ? "制裁名單請看官方原文。" : "這篇公告的內容請看官方原文。") + "</p>";
+    }
+    var tldr = p.ai && p.ai.tldr ? '<span class="tldr">💬 ' + esc(p.ai.tldr) + "</span>" : "";
+    return '<details class="post" style="--cat:' + catVar(p) + '"><summary><span class="sum-text"><span class="row1">' +
       '<span class="tag">' + esc(p.label) + "</span>" +
       (p.pinned ? '<span class="pin">📌 置頂</span>' : "") +
       (isNew(p) ? '<span class="new">NEW</span>' : "") +
-      "<span>" + esc(p.posted || p.date) + '</span></span><span class="title">' + esc(p.title) + "</span></summary>" +
-      '<div class="body">' + body + '<a class="src" href="' + esc(p.url) + '" target="_blank" rel="noopener">閱讀官方原文 →</a></div></details>';
+      "<span>" + esc(p.posted || p.date) + '</span></span><span class="title">' + esc(p.title) + "</span>" + tldr + "</span>" +
+      img(p.cover, "thumb") + "</summary>" +
+      '<div class="body">' + (p.cover ? img(p.cover, "cover") : "") + body +
+      '<a class="src" href="' + esc(p.url) + '" target="_blank" rel="noopener">閱讀官方原文 →</a></div></details>';
   }
 
   function matches(p) {
     if (state.cat !== "all" && p.category !== state.cat) return false;
     if (!state.q) return true;
-    var hay = p.title + " " + (p.intro || []).join(" ") + " " + (p.sections || []).map(function (s) { return s.heading + " " + s.items.join(" "); }).join(" ");
+    var hay = p.title + " " + (p.ai ? p.ai.tldr + " " + p.ai.points.map(function (x) { return x.title + " " + x.text; }).join(" ") : "") + " " + (p.intro || []).join(" ") + " " + (p.sections || []).map(function (s) { return s.heading + " " + s.items.join(" "); }).join(" ");
     return hay.toLowerCase().indexOf(state.q.toLowerCase()) >= 0;
   }
 

@@ -18,6 +18,12 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT = os.path.join(ROOT, "data", "news.json")
 LIST_PAGES = 2          # newest ~20 posts per run
 KEEP = 120              # posts kept in the archive
+SCHEMA = 2              # bump to re-fetch every post after a format change
+AI_PER_RUN = 12         # GitHub Models free tier is rate limited; backfill slowly
+NO_AI = {"sanction"}    # weekly ban lists: nothing to explain
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import ai  # noqa: E402
 
 ROW_RE = re.compile(
     r'<a href="/tw/news/([a-z0-9]+)" class="row">(.*?)</a>', re.S)
@@ -89,58 +95,104 @@ def text_of(node):
     return "".join(text_of(c) for c in node.get("children", []))
 
 
+CONTAINERS = {"quote", "collapsible-container", "collapsible-content", "collapsible-title"}
+
+
 def outline(root):
-    """Turn the article into a short outline: headings + bullet points."""
+    """Turn the article into sections: heading, bullet points, official images, tables.
+
+    Also returns `text`: a plain-text version (with [圖N] markers) used only as AI input,
+    never saved to the published data.
+    """
     blocks = []
     intro = []
+    images = []      # all image urls in order; [圖N] = images[N-1]
+    text = []
+
+    def cur():
+        if not blocks:
+            blocks.append({"heading": "", "items": [], "images": [], "tables": []})
+        return blocks[-1]
 
     def add_list(node, depth=0):
         for li in node.get("children", []):
             nested = [c for c in li.get("children", []) if c.get("type") == "list"]
             own = "".join(text_of(c) for c in li.get("children", [])
                           if c.get("type") != "list").strip()
-            if own and blocks:
-                blocks[-1]["items"].append(("　" * depth) + own)
+            if own:
+                cur()["items"].append(("　" * depth) + own)
+                text.append(("  " * depth) + "- " + own)
             for n in nested:
                 add_list(n, depth + 1)
 
-    for node in root.get("children", []):
+    def visit(node):
         t = node.get("type")
+        if t in CONTAINERS:
+            for c in node.get("children", []):
+                visit(c)
+            return
+        if t == "image":
+            src = node.get("src", "")
+            if src.startswith("https://"):
+                images.append(src)
+                cur()["images"].append(src)
+                text.append(f"[圖{len(images)}]")
+            return
+        # images can also sit inside a paragraph
+        for c in node.get("children", []):
+            if c.get("type") == "image":
+                visit(c)
         txt = text_of(node).strip()
         if t == "heading":
-            blocks.append({"heading": txt.lstrip("■□◆◇●○▶▷★☆ ").strip(), "items": []})
+            blocks.append({"heading": txt.lstrip("■□◆◇●○▶▷★☆ ").strip(),
+                           "items": [], "images": [], "tables": []})
+            text.append("\n## " + txt)
         elif t == "list":
-            if not blocks:
-                blocks.append({"heading": "", "items": []})
             add_list(node)
         elif t == "table":
-            if not blocks:
-                blocks.append({"heading": "", "items": []})
+            rows = []
             for row in node.get("children", []):
-                cells = [text_of(c).strip() for c in row.get("children", [])]
-                cells = [c for c in cells if c]
-                if cells:
-                    blocks[-1]["items"].append("｜".join(cells))
+                rows.append([text_of(c).strip() for c in row.get("children", [])])
+            rows = [r for r in rows if any(r)][:20]
+            if rows:
+                cur()["tables"].append(rows)
+                text.extend("| " + " | ".join(r) + " |" for r in rows)
         elif t == "paragraph" and txt:
+            text.append(txt)
             if blocks:
                 blocks[-1]["items"].append(txt)
             else:
                 intro.append(txt)
+
+    for node in root.get("children", []):
+        visit(node)
+
     # trim: skip greeting lines, cap lengths so this stays a digest
     intro = [p for p in intro if "您好" not in p and "冒險家們，" not in p
              and not BOILER.search(p)][:3]
     for b in blocks:
         items = [i for i in b["items"] if not BOILER.search(i)]
-        b["items"] = [i if len(i) <= 140 else i[:138] + "…" for i in items][:10]
-    blocks = [b for b in blocks if b["heading"] or b["items"]][:8]
-    return {"intro": intro, "sections": blocks}
+        b["items"] = [i if len(i) <= 160 else i[:158] + "…" for i in items][:14]
+        b["images"] = b["images"][:3]
+        b["tables"] = b["tables"][:2]
+    blocks = [b for b in blocks if b["heading"] or b["items"] or b["images"] or b["tables"]][:14]
+    return {"intro": intro, "sections": blocks, "images": images,
+            "text": "\n".join(text)}
 
 
-def parse_detail(page_html):
+THUMB_RE = re.compile(r'<img src="(https://[^"]+/news/thumbnails/[^"]+)"')
+
+
+def parse_detail(page_html, keep_text=False):
     meta = META_RE.search(page_html)
+    thumb = THUMB_RE.search(page_html)
     root = lexical_doc(page_html)
-    out = {"posted": meta.group(1).strip() if meta else ""}
-    out.update(outline(root) if root else {"intro": [], "sections": []})
+    out = {"posted": meta.group(1).strip() if meta else "",
+           "cover": thumb.group(1) if thumb else ""}
+    o = outline(root) if root else {"intro": [], "sections": [], "images": [], "text": ""}
+    if not keep_text:
+        o.pop("text")
+    out.update(o)
     return out
 
 
@@ -161,17 +213,36 @@ def main():
     if not fresh:
         sys.exit("No posts parsed - site layout may have changed.")
 
+    token = os.environ.get("GITHUB_TOKEN", "")
+    ai_budget = AI_PER_RUN if token else 0
     merged = dict(old)
     changed = 0
     for p in fresh:
         prev = old.get(p["id"])
-        if prev and prev["title"] == p["title"] and prev.get("sections") is not None:
+        same = bool(prev) and prev["title"] == p["title"] and prev.get("v") == SCHEMA
+        wants_ai = (ai_budget > 0 and p["category"] not in NO_AI
+                    and not (same and prev.get("ai")))
+        if same and prev.get("sections") is not None and not wants_ai:
             prev.update({k: p[k] for k in ("pinned", "label", "category", "date")})
             continue
         try:
-            p.update(parse_detail(fetch(p["url"])))
+            d = parse_detail(fetch(p["url"]), keep_text=True)
+            text = d.pop("text")
+            p.update(d)
+            p["v"] = SCHEMA
+            if same and prev.get("ai"):
+                p["ai"] = prev["ai"]
+            if wants_ai and text.strip():
+                ai_budget -= 1
+                try:
+                    p["ai"] = ai.summarize(p["title"], text, len(p["images"]), token)
+                    print("ai ok:", p["title"])
+                except Exception as e:
+                    print(f"ai failed {p['id']}: {e}", file=sys.stderr)
         except Exception as e:
             print(f"detail failed {p['id']}: {e}", file=sys.stderr)
+            if prev:
+                continue
             p.update({"posted": "", "intro": [], "sections": None})
         p["first_seen"] = (prev or {}).get("first_seen") or time.strftime(
             "%Y-%m-%dT%H:%M:%SZ", time.gmtime())
@@ -202,7 +273,11 @@ def write_feed(posts):
     items = []
     for p in posts[:30]:
         lines = []
-        for s in p.get("sections") or []:
+        a = p.get("ai")
+        if a and a.get("points"):
+            lines.append("💬 " + a["tldr"])
+            lines += [f"{x['emoji']} {x['title']}：{x['text']}" for x in a["points"]]
+        for s in ([] if lines else p.get("sections") or []):
             if s["heading"]:
                 lines.append("■ " + s["heading"])
             lines += ["・" + i for i in s["items"][:5]]

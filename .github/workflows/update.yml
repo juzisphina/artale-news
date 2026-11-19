@@ -8,6 +8,7 @@ on:
 permissions:
   contents: write
   issues: write
+  models: read
 
 concurrency:
   group: scrape
@@ -22,7 +23,9 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Fetch announcements
+      - name: Fetch announcements (+ plain-language AI summary)
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
         run: python scripts/scrape.py
       - name: Commit if changed
         run: |
