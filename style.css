@@ -119,6 +119,21 @@ a { color: var(--accent); }
 .body .src { display: inline-block; margin-top: 12px; font-weight: 700; }
 .empty { text-align: center; color: var(--soft); }
 
+.pager { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 6px; margin: 18px 0 4px; }
+.pager:empty { display: none; }
+.pg-n {
+  min-width: 36px; height: 36px; padding: 0 10px;
+  border: 1.5px solid var(--line); border-radius: 999px;
+  background: var(--card); color: var(--ink);
+  font: inherit; font-size: .9rem; cursor: pointer;
+}
+.pg-n:hover:not([disabled]) { border-color: var(--accent-2); }
+.pg-n[aria-current="page"] { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 700; }
+.pg-n[disabled] { opacity: .4; cursor: default; }
+.pg-n:focus-visible { outline: 3px solid var(--accent-2); outline-offset: 2px; }
+.pg-gap { color: var(--soft); padding: 0 2px; }
+@media (max-width: 560px) { .pager { gap: 5px; } .pg-txt { display: none; } }
+
 /* card summary with thumbnail */
 .post > summary { grid-template-columns: 1fr auto; align-items: center; gap: 12px; }
 .sum-text { display: grid; gap: 4px; min-width: 0; }

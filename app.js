@@ -10,7 +10,7 @@
     { key: "sanction", label: "制裁" }
   ];
   var COLOR = { update: "--c-update", maintenance: "--c-maintenance", event: "--c-event", shop: "--c-shop", sanction: "--c-sanction" };
-  var state = { cat: "all", q: "", posts: [] };
+  var state = { cat: "all", q: "", posts: [], page: 1 };
 
   function $(id) { return document.getElementById(id); }
   function esc(s) {
@@ -221,19 +221,49 @@
     return hay.toLowerCase().indexOf(state.q.toLowerCase()) >= 0;
   }
 
+  var PER_PAGE = 10;
+  function pagerHtml(page, pages) {
+    if (pages < 2) return "";
+    var nums = [], last = 0;
+    for (var i = 1; i <= pages; i++) {
+      if (i === 1 || i === pages || Math.abs(i - page) <= 1) {
+        if (last && i - last > 1) nums.push('<span class="pg-gap">…</span>');
+        nums.push('<button type="button" class="pg-n" data-page="' + i + '"' + (i === page ? ' aria-current="page"' : "") + ">" + i + "</button>");
+        last = i;
+      }
+    }
+    return '<button type="button" class="pg-n pg-step" data-page="' + (page - 1) + '"' + (page === 1 ? " disabled" : "") + ' aria-label="上一頁">‹<span class="pg-txt"> 上一頁</span></button>' +
+      nums.join("") +
+      '<button type="button" class="pg-n pg-step" data-page="' + (page + 1) + '"' + (page === pages ? " disabled" : "") + ' aria-label="下一頁"><span class="pg-txt">下一頁 </span>›</button>';
+  }
+
   function renderList() {
     var shown = state.posts.filter(matches);
-    $("list").innerHTML = shown.map(postHtml).join("");
+    var pages = Math.max(1, Math.ceil(shown.length / PER_PAGE));
+    if (state.page > pages) state.page = pages;
+    if (state.page < 1) state.page = 1;
+    var start = (state.page - 1) * PER_PAGE;
+    $("list").innerHTML = shown.slice(start, start + PER_PAGE).map(postHtml).join("");
+    $("pager").innerHTML = pagerHtml(state.page, pages);
     $("empty").hidden = shown.length > 0;
   }
+
+  $("pager").addEventListener("click", function (e) {
+    var b = e.target.closest("[data-page]");
+    if (!b || b.disabled) return;
+    state.page = +b.getAttribute("data-page");
+    renderList();
+    $("chips").scrollIntoView({ behavior: "smooth", block: "start" });
+  });
 
   $("chips").addEventListener("click", function (e) {
     var b = e.target.closest(".chip");
     if (!b) return;
     state.cat = b.getAttribute("data-cat");
+    state.page = 1;
     renderChips(); renderList();
   });
-  $("q").addEventListener("input", function (e) { state.q = e.target.value.trim(); renderList(); });
+  $("q").addEventListener("input", function (e) { state.q = e.target.value.trim(); state.page = 1; renderList(); });
 
   function byId(id) { return state.posts.filter(function (p) { return p.id === id; })[0]; }
 
