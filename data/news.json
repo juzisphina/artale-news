@@ -2,6 +2,22 @@
  "source": "https://artale.live/tw/news",
  "posts": [
   {
+   "id": "odyaw4dyb1fgfc0j6k5i4a95",
+   "title": "11/20（五）本週違規制裁紀錄",
+   "date": "2026.11.20",
+   "category": "sanction",
+   "label": "制裁",
+   "pinned": false,
+   "url": "https://artale.live/tw/news/odyaw4dyb1fgfc0j6k5i4a95",
+   "posted": "2026.11.20 16:17",
+   "cover": "",
+   "intro": [],
+   "sections": [],
+   "images": [],
+   "v": 2,
+   "first_seen": "2026-11-20T08:40:55Z"
+  },
+  {
    "id": "qbd75l25nnyw1hsdcwe24ei9",
    "title": "冒險家們已經找到序號了？35組創作者兌換券公開！",
    "date": "2026.11.18",
@@ -145,7 +161,7 @@
   },
   {
    "id": "tsijzkrlsgtxs4f4aopbz7pe",
-   "title": "11/17（二）Artale World 更新公告",
+   "title": "11/17（二）Artale World 更新公告(更正)",
    "date": "2026.11.17",
    "category": "update",
    "label": "更新",
@@ -154,14 +170,15 @@
    "posted": "2026.11.17 08:13",
    "cover": "https://d2lkl8esdt2p15.cloudfront.net/news/thumbnails/jqt7oms0it8dvcskqmy2v672.webp",
    "intro": [
-    "感謝各位冒險家一直以來對 Artale 的陪伴與支持，以下將為各位介紹本次更新內容。",
-    "詳細內容請參考下方說明。"
+    "[公告] 事前預約人數標示更正及獎勵發放說明",
+    "我們是 Artale 開發團隊。",
+    "感謝各位冒險家對事前預約的關注。"
    ],
    "sections": [
     {
      "heading": "[更新目錄]",
      "items": [
-      "事前預約200萬人提前達標！感謝各位冒險家的熱情支持！",
+      "事前預約獎勵發放說明（內容更正）",
       "創作者同樂會！特別序號活動登場！",
       "馬萊尼西亞島＆楓幣機器怪物技能書掉落率 UP！",
       "追蹤官方 Instagram 領取特別好禮！",
@@ -174,17 +191,16 @@
      "tables": []
     },
     {
-     "heading": "1.  事前預約200萬人提前達成！感謝各位冒險家的熱情支持！",
+     "heading": "1.  事前預約獎勵發放說明（內容更正）",
      "items": [
-      "在各位冒險家的熱情支持下，皇家騎士團事前預約參與人數已提前達成200萬人！",
-      "衷心感謝所有期待全新冒險並踴躍參與事前預約的冒險家們！",
-      "隨著事前預約目標全數達成，所有階段的獎勵皆已開放，並預計於2026年11月24日(二)更新維護後，依序發放給所有參與事前預約的冒險家。",
-      "尚未參與事前預約的冒險家們，快來登錄事前預約，領取特別獎勵！",
+      "※ 已完成此處的內容更正，詳細內容請參閱本公告最上方的說明。",
+      "無論是否參與事前預約，皆可獲得事前預約所有階段的獎勵。",
+      "預計於2026年11月24日(二)更新維護後發放。詳細發放對象及領取期限，請參閱上方說明。",
       "敬請各位冒險家多多關注與期待，皇家騎士團的全新冒險即將在 Artale 正式登場！",
       "[前往 Artale 全新職業《皇家騎士團》事前預約頁面]"
      ],
      "images": [
-      "https://d2lkl8esdt2p15.cloudfront.net/general/n384or0djrtrksebbce214jq.webp"
+      "https://d2lkl8esdt2p15.cloudfront.net/general/gupeiahrf45i1bbxxjb0ix2t.webp"
      ],
      "tables": []
     },
@@ -354,53 +370,12 @@
     }
    ],
    "images": [
-    "https://d2lkl8esdt2p15.cloudfront.net/general/n384or0djrtrksebbce214jq.webp",
+    "https://d2lkl8esdt2p15.cloudfront.net/general/gupeiahrf45i1bbxxjb0ix2t.webp",
     "https://d2lkl8esdt2p15.cloudfront.net/general/ob9wushywj91lrqrq3h43bsl.webp",
     "https://d2lkl8esdt2p15.cloudfront.net/general/kht85bpi9gnttzz0lc3ivfzk.webp"
    ],
    "v": 2,
-   "first_seen": "2026-11-19T17:55:40Z",
-   "ai": {
-    "tldr": "預約 200 萬達標、技能書加碼、萬聖節收尾。",
-    "points": [
-     {
-      "emoji": "👑",
-      "title": "預約 200 萬人達標",
-      "text": "皇家騎士團事前預約全階段獎勵解鎖，11/24（二）維護後會陸續發到參加預約的人。還沒預約可以趕快補。",
-      "img": 1
-     },
-     {
-      "emoji": "🎤",
-      "title": "看直播拿序號",
-      "text": "創作者同樂會開跑：看創作者直播拿兌換券 → 換創作者硬幣 → 找「超級巨星皮卡啾」換傷害字型、騎寵、椅子。",
-      "img": 2
-     },
-     {
-      "emoji": "📕",
-      "title": "技能書掉率 UP 第 2 週",
-      "text": "11/17～11/24 打「黃色炸彈球」和「電子機器人」技能書比較好掉，其他道具掉率沒變。",
-      "img": null
-     },
-     {
-      "emoji": "📸",
-      "title": "追蹤 IG 拿禮物",
-      "text": "官方 IG 追蹤活動到 11/24 維護前結束，滿 1 萬人送「腸腸想劍你」道具。",
-      "img": 3
-     },
-     {
-      "emoji": "🎃",
-      "title": "萬聖節結束，商店還能用",
-      "text": "萬聖節活動維護後結束，但楓幣商店、南瓜硬幣商店和戒指強化可以用到 12/1 維護前；加倍券領了 14 天內要用掉。",
-      "img": null
-     }
-    ],
-    "todo": [
-     "11/24 前打炸彈球、電子機器人刷技能書",
-     "12/1 前把南瓜硬幣花掉",
-     "武陵道場還沒全通關的，下週前去拿第一賽季勳章"
-    ],
-    "model": "Claude（手寫整理）"
-   }
+   "first_seen": "2026-11-19T17:55:40Z"
   },
   {
    "id": "r5ante5jjk0sblhjcu35wpqu",
@@ -4157,7 +4132,7 @@
   },
   {
    "id": "twn9u2gvoppo62n3jiil9zmz",
-   "title": "10/26（一）Artale World 事前預約登錄開跑",
+   "title": "10/26（一）Artale World 事前預約登錄開跑(更正)",
    "date": "2026.10.26",
    "category": "update",
    "label": "更新",
@@ -4165,7 +4140,11 @@
    "url": "https://artale.live/tw/news/twn9u2gvoppo62n3jiil9zmz",
    "posted": "2026.10.26 14:01",
    "cover": "",
-   "intro": [],
+   "intro": [
+    "[更正] 事前預約獎勵的發放方式已變更",
+    "無論是否參與事前預約，皆可獲得事前預約所有階段的獎勵。詳細內容請參閱11月17日更新公告上方的相關說明。",
+    "[前往11/17（二）Artale World 更新公告(更正)確認]"
+   ],
    "sections": [
     {
      "heading": "",
@@ -4217,35 +4196,8 @@
     "https://d2lkl8esdt2p15.cloudfront.net/general/abbvbls5jjtxmkpqr42qdbjv.webp"
    ],
    "v": 2,
-   "first_seen": "2026-11-19T17:55:41Z",
-   "ai": {
-    "tldr": "皇家騎士團事前預約開跑，人越多獎勵越多。",
-    "points": [
-     {
-      "emoji": "👑",
-      "title": "要來的新東西",
-      "text": "新職業「皇家騎士團」、多角色系統、武陵道場第 2 季。",
-      "img": 1
-     },
-     {
-      "emoji": "📝",
-      "title": "事前預約",
-      "text": "10/26 14:00～11/23 14:00 可以預約，到官方預約頁登錄就好。",
-      "img": null
-     },
-     {
-      "emoji": "🎁",
-      "title": "獎勵",
-      "text": "人數到 20、50、100、150、180、200 萬會一路解鎖，全解約值 20,000 WC：倉鼠椅子、喵喵號騎寵、嗷嗚聊天／名牌戒指等。",
-      "img": null
-     }
-    ],
-    "todo": [
-     "11/23 14:00 前完成事前預約"
-    ],
-    "model": "Claude（手寫整理）"
-   }
+   "first_seen": "2026-11-19T17:55:41Z"
   }
  ],
- "updated": "2026-11-19T18:09:35Z"
+ "updated": "2026-11-20T08:40:56Z"
 }
