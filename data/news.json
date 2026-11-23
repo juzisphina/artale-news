@@ -2,6 +2,63 @@
  "source": "https://artale.live/tw/news",
  "posts": [
   {
+   "id": "evh3kazstkkub1dkl8tfaier",
+   "title": "11/24（二）Artale World 維護公告",
+   "date": "2026.11.23",
+   "category": "maintenance",
+   "label": "維護",
+   "pinned": false,
+   "url": "https://artale.live/tw/news/evh3kazstkkub1dkl8tfaier",
+   "posted": "2026.11.23 16:20",
+   "cover": "https://d2lkl8esdt2p15.cloudfront.net/news/thumbnails/vkymxoetg2ijz4evzio9m4yf.webp",
+   "intro": [
+    "為了提供更穩定的服務，我們將進行維護，請參考以下公告說明。"
+   ],
+   "sections": [
+    {
+     "heading": "維護時間",
+     "items": [
+      "11/24(二)08:00 ～ 12:00(GMT+8)",
+      "※ 維護時間可能會依實際情況有所調整，如有變動將另行公告通知。"
+     ],
+     "images": [],
+     "tables": []
+    },
+    {
+     "heading": "維護內容",
+     "items": [
+      "PC／手機版共通",
+      "全新冒險正式啟程！「皇家騎士團」登場",
+      "皇家騎士團的故鄉，全新地區「耶雷弗」登場！",
+      "展現各職業獨特的戰鬥魅力！冒險家職業技能調整",
+      "自由體驗更多全新職業！擴充「角色欄位」",
+      "邁向更強大的成長之路！擴充「項鍊欄位」",
+      "三隻寵物陪你一起冒險！擴充「寵物欄位」及新增組合效果",
+      "挑戰再升級！「武陵道場 Season 2」正式開放",
+      "創作者同樂會！第二波特別序號活動！",
+      "慶祝「皇家騎士團」登場！推出特別活動",
+      "第三週馬萊尼西亞島＆楓幣機器怪物技能書掉落率 UP！",
+      "其他遊戲內容優化"
+     ],
+     "images": [],
+     "tables": []
+    },
+    {
+     "heading": "維護影響",
+     "items": [
+      "PC／手機版共通",
+      "維護期間將無法進入 Artale World",
+      "若於維護期間仍處於登入狀態，系統將顯示錯誤訊息，並可能強制中斷連線"
+     ],
+     "images": [],
+     "tables": []
+    }
+   ],
+   "images": [],
+   "v": 2,
+   "first_seen": "2026-11-23T08:37:12Z"
+  },
+  {
    "id": "odyaw4dyb1fgfc0j6k5i4a95",
    "title": "11/20（五）本週違規制裁紀錄",
    "date": "2026.11.20",
@@ -4199,5 +4256,5 @@
    "first_seen": "2026-11-19T17:55:41Z"
   }
  ],
- "updated": "2026-11-20T08:40:56Z"
+ "updated": "2026-11-23T08:37:13Z"
 }
