@@ -7,7 +7,7 @@
 <meta name="description" content="Artale 台服官方公告的重點整理：改版更新、維護時間、活動與購物商場，自動同步。">
 <link rel="alternate" type="application/rss+xml" title="Artale 台服公告小整理" href="feed.xml">
 <link rel="icon" type="image/svg+xml" href="icon.svg?v=1">
-<link rel="stylesheet" href="style.css?v=7">
+<link rel="stylesheet" href="style.css?v=8">
 </head>
 <body>
 <header class="hero">
@@ -31,7 +31,10 @@
       <h1>Artale 台服公告小整理</h1>
       <p class="sub">改版更新・維護時間・活動・購物商場，一頁看重點 ✨</p>
       <p class="meta"><span id="updated">載入中…</span> ・ <a href="feed.xml">RSS 訂閱</a> ・ <a href="https://artale.live/tw/news" target="_blank" rel="noopener">官方公告</a></p>
-      <button id="aiBtn" class="ai-btn" type="button">✨ AI 白話設定</button>
+      <div class="hero-btns">
+        <button id="refreshBtn" class="ai-btn" type="button">🔄 檢查新公告</button>
+        <button id="aiBtn" class="ai-btn" type="button">✨ AI 白話設定</button>
+      </div>
     </div>
   </div>
 </header>
@@ -43,6 +46,7 @@
     <input id="q" type="search" placeholder="搜尋公告…（例：技能書、維護）" aria-label="搜尋公告">
   </section>
 
+  <button id="newBar" class="new-bar" type="button" hidden></button>
   <section id="list" class="list" aria-live="polite"></section>
   <nav id="pager" class="pager" aria-label="分頁"></nav>
   <p id="empty" class="empty" hidden>找不到符合的公告 🥲</p>
@@ -71,6 +75,6 @@
   <p>🍊 非官方粉絲整理・每 30 分鐘自動同步・內容以 <a href="https://artale.live/tw/news" target="_blank" rel="noopener">官方公告</a> 為準</p>
   <p>Made with 🧡 by <a href="https://github.com/juzisphina">juzisphina</a></p>
 </footer>
-<script src="app.js?v=7"></script>
+<script src="app.js?v=8"></script>
 </body>
 </html>

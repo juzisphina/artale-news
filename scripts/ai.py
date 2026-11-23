@@ -5,8 +5,41 @@ import urllib.error
 import urllib.request
 
 BASE = "https://generativelanguage.googleapis.com/v1beta/models/"
-MODELS = [os.environ.get("GEMINI_MODEL", "gemini-2.5-flash"), "gemini-2.5-flash-lite"]
-MODEL = MODELS[0]
+import re
+
+# Google keeps retiring model names, so ask the key's model list and pick from it.
+PREFERRED = ["gemini-flash-latest", "gemini-3.8-flash", "gemini-3.6-flash", "gemini-3.5-flash-lite",
+             "gemini-4-hydrogen", "gemini-flash-lite-latest"]
+SKIP = re.compile(r"image|tts|audio|live|embed|vision|exp|robotics|computer|gemma|learnlm|aqa|native", re.I)
+MAX_TRIES = 5
+_models = None
+
+
+def _ver(name):
+    m = re.search(r"gemini-(\d+(?:\.\d+)?)", name)
+    return float(m.group(1)) if m else 0.0
+
+
+def pick_models(key):
+    global _models
+    if _models is not None:
+        return _models
+    req = urllib.request.Request(BASE.rstrip("/") + "?pageSize=1000", headers={"x-goog-api-key": key})
+    try:
+        with urllib.request.urlopen(req, timeout=30) as r:
+            data = json.loads(r.read().decode("utf-8", "replace"))
+        names = [m["name"].removeprefix("models/") for m in data.get("models", [])
+                 if "generateContent" in m.get("supportedGenerationMethods", [])]
+    except Exception:
+        names = list(PREFERRED)
+    have = set(names)
+    out = [os.environ["GEMINI_MODEL"]] if os.environ.get("GEMINI_MODEL") else []
+    out += [n for n in PREFERRED if n in have]
+    flash = [n for n in names if "flash" in n and not SKIP.search(n)]
+    flash.sort(key=lambda n: ("preview" in n, "lite" in n, -_ver(n)))
+    out += flash
+    _models = list(dict.fromkeys(out))[:MAX_TRIES]
+    return _models
 
 SYSTEM = """你是 Artale 台服的老玩家，幫朋友把官方公告「翻成人話」。
 規則：
@@ -52,14 +85,14 @@ def call_gemini(model, system, user, key):
 def summarize(title, text, n_images, key):
     user = f"公告標題：{title}\n圖片數量：{n_images}\n\n公告內容：\n{text[:12000]}"
     err = None
-    for model in dict.fromkeys(MODELS):
+    for model in pick_models(key):
         try:
             out = call_gemini(model, SYSTEM, user, key)
             break
         except Exception as e:
             err = e
     else:
-        raise err
+        raise err or RuntimeError("no Gemini model available for this key")
     # sanitize
     pts = []
     for p in (out.get("points") or [])[:5]:

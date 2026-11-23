@@ -82,7 +82,37 @@
 
   // ---------- bring-your-own Gemini key (stored only in this browser) ----------
   var KEY_STORE = "artale.geminiKey", CACHE = "artale.ai.";
-  var MODELS = ["gemini-2.5-flash", "gemini-2.5-flash-lite"];
+  // Google keeps retiring model names, so ask the key's own model list and pick from it.
+  var PREFERRED = ["gemini-flash-latest", "gemini-3.8-flash", "gemini-3.6-flash", "gemini-3.5-flash-lite", "gemini-4-hydrogen", "gemini-flash-lite-latest"];
+  var MODEL_STORE = "artale.geminiModel", MAX_TRIES = 5;
+  var SKIP_MODEL = /image|tts|audio|live|embed|vision|exp|robotics|computer|gemma|learnlm|aqa|native/i;
+  function verNum(n) { var m = n.match(/gemini-(\d+(?:\.\d+)?)/); return m ? parseFloat(m[1]) : 0; }
+  function rankModels(names) {
+    var have = {}; names.forEach(function (n) { have[n] = true; });
+    var out = [];
+    var last = load(MODEL_STORE);
+    if (last && have[last]) out.push(last);
+    PREFERRED.forEach(function (n) { if (have[n]) out.push(n); });
+    names.filter(function (n) { return /flash/i.test(n) && !SKIP_MODEL.test(n); })
+      .sort(function (a, b) {
+        var pa = /preview/.test(a), pb = /preview/.test(b), la = /lite/.test(a), lb = /lite/.test(b);
+        return (pa - pb) || (la - lb) || (verNum(b) - verNum(a));
+      })
+      .forEach(function (n) { out.push(n); });
+    return out.filter(function (n, i) { return out.indexOf(n) === i; });
+  }
+  function listModels(key) {
+    return fetch("https://generativelanguage.googleapis.com/v1beta/models?pageSize=1000", { headers: { "x-goog-api-key": key } })
+      .then(function (r) {
+        return r.json().catch(function () { return {}; }).then(function (j) {
+          if (!r.ok) { var e = new Error((j.error && j.error.message) || ""); e.status = r.status; throw e; }
+          return (j.models || []).filter(function (m) {
+            return (m.supportedGenerationMethods || []).indexOf("generateContent") >= 0;
+          }).map(function (m) { return String(m.name).replace(/^models\//, ""); });
+        });
+      });
+  }
+  function badKey(e) { return e && (e.status === 400 || e.status === 401 || e.status === 403) && /API key/i.test(e.message || ""); }
   var busy = {};
   function store(k, v) {
     try { if (v == null) localStorage.removeItem(k); else localStorage.setItem(k, v); return true; } catch (e) { return false; }
@@ -142,13 +172,13 @@
         return { emoji: String(x.emoji || "🍊").slice(0, 4), title: String(x.title || "").slice(0, 30), text: String(x.text || "").slice(0, 200), img: i };
       }),
       todo: (out.todo || []).slice(0, 3).map(function (t) { return String(t).slice(0, 80); }),
-      model: "gemini（你的金鑰）"
+      model: (load(MODEL_STORE) || "gemini") + "（你的金鑰）"
     };
   }
 
   function errText(e) {
     var m = (e && e.message) || "";
-    if (e && (e.status === 400 && /API key/i.test(m))) return "金鑰無效，請到「✨ AI 白話設定」檢查是否貼對。";
+    if (badKey(e)) return "金鑰無效，請到「✨ AI 白話設定」檢查是否貼對。";
     if (e && e.status === 429) return "AI 額度暫時用完了，過一會兒再試。";
     if (e && e.status === 403) return "這把金鑰沒有權限使用 Gemini（可能是專案沒開免費額度）。";
     if (e instanceof TypeError) return "連不上 Google AI，請確認網路後再試。";
@@ -160,13 +190,21 @@
     if (!key || busy[p.id]) return;
     busy[p.id] = true;
     rerender(p);
+    var models;
     var tryModel = function (i) {
-      return callGemini(MODELS[i], key, p).catch(function (e) {
-        if (i + 1 < MODELS.length && e.status !== 400 && e.status !== 403) return tryModel(i + 1);
+      return callGemini(models[i], key, p).then(function (out) {
+        store(MODEL_STORE, models[i]);
+        return out;
+      }, function (e) {
+        if (!badKey(e) && !(e instanceof TypeError) && i + 1 < Math.min(models.length, MAX_TRIES)) return tryModel(i + 1);
         throw e;
       });
     };
-    tryModel(0).then(function (out) {
+    listModels(key).then(function (names) {
+      models = rankModels(names);
+      if (!models.length) { var e = new Error("這把金鑰找不到可用的 Gemini 文字模型"); e.status = 404; throw e; }
+      return tryModel(0);
+    }).then(function (out) {
       p.ai = clean(out, p);
       p.aiErr = "";
       store(CACHE + p.id, JSON.stringify({ title: p.title, ai: p.ai }));
@@ -298,6 +336,7 @@
     var v = $("aiKey").value.trim();
     if (!v) { $("aiStatus").textContent = "請先貼上金鑰"; return; }
     if (!store(KEY_STORE, v)) { $("aiStatus").textContent = "這個瀏覽器不允許儲存（可能是無痕模式）"; return; }
+    store(MODEL_STORE, null);
     state.posts.forEach(function (p) { p.aiErr = ""; });
     closeDlg(); renderList();
   });
@@ -306,23 +345,79 @@
     closeDlg(); renderList();
   });
 
-  fetch("data/news.json?t=" + Date.now())
-    .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
-    .then(function (d) {
-      state.posts = d.posts || [];
-      // summaries this browser made earlier (only reused while the post title is unchanged)
-      state.posts.forEach(function (p) {
-        if (p.ai) return;
-        try {
-          var c = JSON.parse(load(CACHE + p.id) || "null");
-          if (c && c.title === p.title && c.ai) p.ai = c.ai;
-        } catch (e) { /* ignore broken cache */ }
-      });
-      $("updated").textContent = "最後同步：" + fmtTime(d.updated) + "（台灣時間）";
-      renderChips(); renderList();
-    })
-    .catch(function () {
-      $("updated").textContent = "資料載入失敗，請稍後再試";
-      $("empty").hidden = false;
+  // ---------- loading + "new posts" check ----------
+  var pending = null, lastCheck = 0, CHECK_EVERY = 5 * 60000;
+  function fetchData() {
+    return fetch("data/news.json?t=" + Date.now(), { cache: "no-store" })
+      .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); });
+  }
+  function newCount(d) {
+    var have = {};
+    state.posts.forEach(function (p) { have[p.id] = true; });
+    return (d.posts || []).filter(function (p) { return !have[p.id]; }).length;
+  }
+  function apply(d) {
+    var keep = {};
+    state.posts.forEach(function (p) { if (p.aiErr) keep[p.id] = p.aiErr; });
+    state.posts = d.posts || [];
+    // summaries this browser made earlier (only reused while the post title is unchanged)
+    state.posts.forEach(function (p) {
+      if (keep[p.id]) p.aiErr = keep[p.id];
+      if (p.ai) return;
+      try {
+        var c = JSON.parse(load(CACHE + p.id) || "null");
+        if (c && c.title === p.title && c.ai) p.ai = c.ai;
+      } catch (e) { /* ignore broken cache */ }
     });
+    pending = null;
+    $("newBar").hidden = true;
+    $("updated").textContent = "最後同步：" + fmtTime(d.updated) + "（台灣時間）";
+    renderChips(); renderList();
+  }
+  function showNew(d, n) {
+    pending = d;
+    $("newBar").textContent = "🆕 有 " + n + " 篇新公告，點這裡更新";
+    $("newBar").hidden = false;
+  }
+  // background check: never re-draws the list under the reader, just shows the bar
+  function check() {
+    lastCheck = Date.now();
+    fetchData().then(function (d) {
+      var n = newCount(d);
+      if (n > 0) showNew(d, n);
+    }).catch(function () { /* try again next time */ });
+  }
+  setInterval(function () { if (!document.hidden) check(); }, CHECK_EVERY);
+  document.addEventListener("visibilitychange", function () {
+    if (!document.hidden && Date.now() - lastCheck > 60000) check();
+  });
+
+  $("newBar").addEventListener("click", function () {
+    if (!pending) return;
+    state.page = 1; state.cat = "all"; state.q = ""; $("q").value = "";
+    apply(pending);
+    $("chips").scrollIntoView({ behavior: "smooth", block: "start" });
+  });
+
+  var btn = $("refreshBtn"), BTN_TXT = btn.textContent;
+  $("refreshBtn").addEventListener("click", function () {
+    if (btn.disabled) return;
+    btn.disabled = true; btn.textContent = "🔄 檢查中…";
+    lastCheck = Date.now();
+    fetchData().then(function (d) {
+      var n = newCount(d);
+      apply(d);
+      btn.textContent = n > 0 ? "🆕 多了 " + n + " 篇！" : "✅ 已是最新";
+    }).catch(function () {
+      btn.textContent = "⚠️ 連不上，稍後再試";
+    }).then(function () {
+      setTimeout(function () { btn.textContent = BTN_TXT; btn.disabled = false; }, 2500);
+    });
+  });
+
+  lastCheck = Date.now();
+  fetchData().then(apply).catch(function () {
+    $("updated").textContent = "資料載入失敗，請稍後再試";
+    $("empty").hidden = false;
+  });
 })();
