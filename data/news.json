@@ -2,6 +2,42 @@
  "source": "https://artale.live/tw/news",
  "posts": [
   {
+   "id": "vlxauqw6mmtku38rf5jig33a",
+   "title": "11/25（三）《Artale》World 1st HotFix",
+   "date": "2026.11.25",
+   "category": "maintenance",
+   "label": "維護",
+   "pinned": false,
+   "url": "https://artale.live/tw/news/vlxauqw6mmtku38rf5jig33a",
+   "posted": "2026.11.25 16:51",
+   "cover": "https://d2lkl8esdt2p15.cloudfront.net/news/thumbnails/d2z73kmj5sfxr6qxc5hia13c.webp",
+   "intro": [
+    "我們對於此次 1st HotFix 所造成的不便，致上誠摯的歉意。",
+    "1st HotFix 已於 2026/11/25 16:50(GMT+8) 完成更新，更新前建立的頻道，將於18:50(GMT+8) 起關閉。",
+    "【修正事項】"
+   ],
+   "sections": [
+    {
+     "heading": "",
+     "items": [
+      "已修正｢[轉職] 暗夜行者之路｣任務內容中將 LUK 誤標為 DEX 的問題。任務進行條件並未變更，仍可正常進行。",
+      "已改善黑騎士｢龍咆哮｣的技能說明，使冒險家能更清楚地了解技能效果。",
+      "已修正黑騎士｢暗之靈魂風暴｣的技能等級達到一定等級以上時，攻擊速度下降的問題。",
+      "已改善技能點數（SP）的分配機制，避免在已可分配技能點數至下一轉技能的情況下，因連續點擊而意外將額外的技能點數分配至上一轉技能。",
+      "已有冒險家成功通關阿卡伊農(隱藏)突襲BOSS，公開｢支配者墜飾｣、｢梅克奈特墜飾｣及｢阿卡伊農的耳環｣的組合效果正式公開。",
+      "「破損的」、「精緻的」及「燦爛的」墜飾屬於同系列道具。依原先的開發設定，即使使用「項鍊欄位擴充券」，也無法同時裝備同系列的墜飾。 本次更新已修正同系列墜飾可同時裝備的異常問題。",
+      "　若於 HotFix 套用前已同時裝備上述同系列的墜飾，則在 HotFix 套用後，重複裝備的墜飾將自動解除裝備。",
+      "我們將持續優化遊戲內容，努力為您帶來更穩定的遊戲體驗。"
+     ],
+     "images": [],
+     "tables": []
+    }
+   ],
+   "images": [],
+   "v": 2,
+   "first_seen": "2026-11-25T09:08:48Z"
+  },
+  {
    "id": "nhu9jlw3c31hxlfz55jk657u",
    "title": "11/24（二）Artale World 更新公告",
    "date": "2026.11.24",
@@ -6174,5 +6210,5 @@
    "first_seen": "2026-11-19T17:55:41Z"
   }
  ],
- "updated": "2026-11-24T01:07:06Z"
+ "updated": "2026-11-25T09:08:49Z"
 }
