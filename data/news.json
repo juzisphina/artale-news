@@ -2,6 +2,38 @@
  "source": "https://artale.live/tw/news",
  "posts": [
   {
+   "id": "fivqgpic7vuzlyhdm8i6whve",
+   "title": "11/26（四）《Artale》World 1st HotFix",
+   "date": "2026.11.26",
+   "category": "maintenance",
+   "label": "維護",
+   "pinned": false,
+   "url": "https://artale.live/tw/news/fivqgpic7vuzlyhdm8i6whve",
+   "posted": "2026.11.26 14:00",
+   "cover": "https://d2lkl8esdt2p15.cloudfront.net/news/thumbnails/ldewlp9a9h9de4e7rbc4muzi.webp",
+   "intro": [
+    "我們對於此次 1st HotFix 所造成的不便，致上誠摯的歉意。",
+    "1st HotFix 已於 2026/11/26 14:00(GMT+8) 完成更新，更新前建立的頻道，將於16:00(GMT+8) 起關閉。",
+    "【修正事項】"
+   ],
+   "sections": [
+    {
+     "heading": "",
+     "items": [
+      "已修正自2026年11月24日(二)起開始的｢每日簽到領好禮！28日每日簽到活動｣中，因簽到天數與日期固定綁定，導致未於指定日期完成任務時，便無法獲得先前簽到獎勵的問題。",
+      "　無論先前是否已完成任務，所有冒險家皆無須額外完成任務，即可領取第1天及第2天的獎勵。",
+      "　自2026年11月26日(四)起，冒險家可從第3天的任務開始進行。此後即使未連續每日完成任務，也可依照累計完成任務的天數，依序獲得簽到獎勵。",
+      "對於造成各位冒險家遊戲上的不便，我們深感抱歉，今後也將竭盡全力，為各位提供更加穩定的遊戲服務。"
+     ],
+     "images": [],
+     "tables": []
+    }
+   ],
+   "images": [],
+   "v": 2,
+   "first_seen": "2026-11-26T06:29:06Z"
+  },
+  {
    "id": "vlxauqw6mmtku38rf5jig33a",
    "title": "11/25（三）《Artale》World 1st HotFix",
    "date": "2026.11.25",
@@ -6210,5 +6242,5 @@
    "first_seen": "2026-11-19T17:55:41Z"
   }
  ],
- "updated": "2026-11-25T09:08:49Z"
+ "updated": "2026-11-26T06:29:07Z"
 }

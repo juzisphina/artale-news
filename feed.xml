@@ -1,4 +1,7 @@
-<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"><channel><title>Artale 台服公告小整理</title><link>https://juzisphina.github.io/artale-news/</link><description>Artale 台服官方公告重點整理（非官方）</description><item><title>【維護】11/25（三）《Artale》World 1st HotFix</title><link>https://artale.live/tw/news/vlxauqw6mmtku38rf5jig33a</link><guid>https://artale.live/tw/news/vlxauqw6mmtku38rf5jig33a</guid><pubDate>2026.11.25 16:51</pubDate><description>・已修正｢[轉職] 暗夜行者之路｣任務內容中將 LUK 誤標為 DEX 的問題。任務進行條件並未變更，仍可正常進行。
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"><channel><title>Artale 台服公告小整理</title><link>https://juzisphina.github.io/artale-news/</link><description>Artale 台服官方公告重點整理（非官方）</description><item><title>【維護】11/26（四）《Artale》World 1st HotFix</title><link>https://artale.live/tw/news/fivqgpic7vuzlyhdm8i6whve</link><guid>https://artale.live/tw/news/fivqgpic7vuzlyhdm8i6whve</guid><pubDate>2026.11.26 14:00</pubDate><description>・已修正自2026年11月24日(二)起開始的｢每日簽到領好禮！28日每日簽到活動｣中，因簽到天數與日期固定綁定，導致未於指定日期完成任務時，便無法獲得先前簽到獎勵的問題。
+・　無論先前是否已完成任務，所有冒險家皆無須額外完成任務，即可領取第1天及第2天的獎勵。
+・　自2026年11月26日(四)起，冒險家可從第3天的任務開始進行。此後即使未連續每日完成任務，也可依照累計完成任務的天數，依序獲得簽到獎勵。
+・對於造成各位冒險家遊戲上的不便，我們深感抱歉，今後也將竭盡全力，為各位提供更加穩定的遊戲服務。</description></item><item><title>【維護】11/25（三）《Artale》World 1st HotFix</title><link>https://artale.live/tw/news/vlxauqw6mmtku38rf5jig33a</link><guid>https://artale.live/tw/news/vlxauqw6mmtku38rf5jig33a</guid><pubDate>2026.11.25 16:51</pubDate><description>・已修正｢[轉職] 暗夜行者之路｣任務內容中將 LUK 誤標為 DEX 的問題。任務進行條件並未變更，仍可正常進行。
 ・已改善黑騎士｢龍咆哮｣的技能說明，使冒險家能更清楚地了解技能效果。
 ・已修正黑騎士｢暗之靈魂風暴｣的技能等級達到一定等級以上時，攻擊速度下降的問題。
 ・已改善技能點數（SP）的分配機制，避免在已可分配技能點數至下一轉技能的情況下，因連續點擊而意外將額外的技能點數分配至上一轉技能。
