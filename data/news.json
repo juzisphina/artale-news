@@ -2,6 +2,22 @@
  "source": "https://artale.live/tw/news",
  "posts": [
   {
+   "id": "esyfp50mtinjjfp1tbqzxvtq",
+   "title": "11/27（五）本週違規制裁紀錄",
+   "date": "2026.11.27",
+   "category": "sanction",
+   "label": "制裁",
+   "pinned": false,
+   "url": "https://artale.live/tw/news/esyfp50mtinjjfp1tbqzxvtq",
+   "posted": "2026.11.27 16:24",
+   "cover": "",
+   "intro": [],
+   "sections": [],
+   "images": [],
+   "v": 3,
+   "first_seen": "2026-11-27T09:06:14Z"
+  },
+  {
    "id": "fivqgpic7vuzlyhdm8i6whve",
    "title": "11/26（四）《Artale》World 1st HotFix",
    "date": "2026.11.26",
@@ -6523,5 +6539,5 @@
    "first_seen": "2026-11-19T17:55:41Z"
   }
  ],
- "updated": "2026-11-27T06:38:33Z"
+ "updated": "2026-11-27T09:06:15Z"
 }
