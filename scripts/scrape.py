@@ -18,7 +18,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT = os.path.join(ROOT, "data", "news.json")
 LIST_PAGES = 2          # newest ~20 posts per run
 KEEP = 120              # posts kept in the archive
-SCHEMA = 2              # bump to re-fetch every post after a format change
+SCHEMA = 3              # bump to re-fetch every post after a format change
 AI_PER_RUN = 8          # Gemini free tier is rate limited; backfill slowly
 NO_AI = {"sanction"}    # weekly ban lists: nothing to explain
 
@@ -153,7 +153,7 @@ def outline(root):
             rows = []
             for row in node.get("children", []):
                 rows.append([text_of(c).strip() for c in row.get("children", [])])
-            rows = [r for r in rows if any(r)][:20]
+            rows = [r for r in rows if any(r)][:60]
             if rows:
                 cur()["tables"].append(rows)
                 text.extend("| " + " | ".join(r) + " |" for r in rows)
