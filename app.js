@@ -112,6 +112,7 @@
         });
       });
   }
+  function badPlace(e) { return e && /location is not supported/i.test(e.message || ""); }
   function badKey(e) { return e && (e.status === 400 || e.status === 401 || e.status === 403) && /API key/i.test(e.message || ""); }
   var busy = {};
   function store(k, v) {
@@ -179,6 +180,7 @@
   function errText(e) {
     var m = (e && e.message) || "";
     if (badKey(e)) return "金鑰無效，請到「✨ AI 白話設定」檢查是否貼對。";
+    if (badPlace(e)) return "Google 不開放你目前所在的地區使用 Gemini（例如中國大陸、香港）。金鑰本身沒問題，要在支援的地區（例如台灣、日本、美國）連線才能用。";
     if (e && e.status === 429) return "AI 額度暫時用完了，過一會兒再試。";
     if (e && e.status === 403) return "這把金鑰沒有權限使用 Gemini（可能是專案沒開免費額度）。";
     if (e instanceof TypeError) return "連不上 Google AI，請確認網路後再試。";
@@ -196,7 +198,7 @@
         store(MODEL_STORE, models[i]);
         return out;
       }, function (e) {
-        if (!badKey(e) && !(e instanceof TypeError) && i + 1 < Math.min(models.length, MAX_TRIES)) return tryModel(i + 1);
+        if (!badKey(e) && !badPlace(e) && !(e instanceof TypeError) && i + 1 < Math.min(models.length, MAX_TRIES)) return tryModel(i + 1);
         throw e;
       });
     };
@@ -249,7 +251,8 @@
       "<span>" + esc(p.posted || p.date) + '</span></span><span class="title">' + esc(p.title) + "</span>" + tldr + "</span>" +
       "</summary>" +
       '<div class="body">' + (p.cover ? img(p.cover, "cover") : "") + body +
-      '<a class="src" href="' + esc(p.url) + '" target="_blank" rel="noopener">閱讀官方原文 →</a></div></details>';
+      '<div class="body-end"><a class="src" href="' + esc(p.url) + '" target="_blank" rel="noopener">閱讀官方原文 →</a>' +
+      '<button type="button" class="fold">▲ 收起，回到這篇標題</button></div></div></details>';
   }
 
   function matches(p) {
@@ -308,8 +311,19 @@
   $("list").addEventListener("click", function (e) {
     var g = e.target.closest(".ai-gen");
     if (g) { generate(byId(g.getAttribute("data-id"))); return; }
-    if (e.target.closest(".ai-open")) openDlg();
+    if (e.target.closest(".ai-open")) { openDlg(); return; }
+    if (e.target.closest(".fold")) {
+      var post = e.target.closest(".post");
+      post.open = false;
+      post.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
   });
+
+  // floating "back to top" button for long posts
+  var toTop = $("toTop");
+  function syncTop() { toTop.hidden = window.scrollY < 700; }
+  window.addEventListener("scroll", syncTop, { passive: true });
+  toTop.addEventListener("click", function () { window.scrollTo({ top: 0, behavior: "smooth" }); });
   // opening a post with no summary: auto-generate when a key is set
   $("list").addEventListener("toggle", function (e) {
     var el = e.target;
@@ -324,7 +338,7 @@
   function openDlg() {
     var k = getKey();
     $("aiKey").value = "";
-    $("aiStatus").textContent = k ? "目前已設定：" + maskKey(k) : "目前沒有設定金鑰";
+    setStatus(k ? "目前已設定：" + maskKey(k) : "目前沒有設定金鑰");
     $("aiClear").hidden = !k;
     if (dlg.showModal) dlg.showModal(); else dlg.setAttribute("open", "");
     $("aiKey").focus();
@@ -332,13 +346,51 @@
   function closeDlg() { if (dlg.close) dlg.close(); else dlg.removeAttribute("open"); }
   $("aiBtn").addEventListener("click", openDlg);
   $("aiCancel").addEventListener("click", closeDlg);
+  // tiny real request so problems show up here, not later inside a post
+  function testKey(key) {
+    return listModels(key).then(function (names) {
+      var models = rankModels(names);
+      if (!models.length) { var e = new Error("這把金鑰找不到可用的 Gemini 文字模型"); e.status = 404; throw e; }
+      return fetch("https://generativelanguage.googleapis.com/v1beta/models/" + models[0] + ":generateContent", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "x-goog-api-key": key },
+        body: JSON.stringify({ contents: [{ role: "user", parts: [{ text: "回覆 OK" }] }], generationConfig: { maxOutputTokens: 5 } })
+      }).then(function (r) {
+        return r.json().catch(function () { return {}; }).then(function (j) {
+          if (!r.ok) { var e = new Error((j.error && j.error.message) || ""); e.status = r.status; throw e; }
+          return models[0];
+        });
+      });
+    });
+  }
+  function setStatus(txt, kind) { var s = $("aiStatus"); s.textContent = txt; s.className = "dlg-status" + (kind ? " " + kind : ""); }
   $("aiSave").addEventListener("click", function () {
     var v = $("aiKey").value.trim();
-    if (!v) { $("aiStatus").textContent = "請先貼上金鑰"; return; }
-    if (!store(KEY_STORE, v)) { $("aiStatus").textContent = "這個瀏覽器不允許儲存（可能是無痕模式）"; return; }
-    store(MODEL_STORE, null);
-    state.posts.forEach(function (p) { p.aiErr = ""; });
-    closeDlg(); renderList();
+    var btn = $("aiSave");
+    if (!v) { setStatus("請先貼上金鑰", "bad"); return; }
+    btn.disabled = true; btn.textContent = "檢查中…";
+    setStatus("正在跟 Google 確認這把金鑰能不能用…");
+    testKey(v).then(function (model) {
+      return { ok: true, model: model };
+    }, function (e) {
+      return { ok: false, e: e };
+    }).then(function (res) {
+      btn.disabled = false; btn.textContent = "儲存";
+      if (!res.ok && badKey(res.e)) { setStatus("❌ 金鑰無效，請檢查是否貼對（沒有儲存）", "bad"); return; }
+      if (res.ok && !store(KEY_STORE, v)) { setStatus("這個瀏覽器不允許儲存（可能是無痕模式）", "bad"); return; }
+      if (!res.ok) {
+        // key looks real but something else blocks it: keep it, explain why
+        store(KEY_STORE, v);
+        setStatus("⚠️ 金鑰已儲存，但現在還不能用：" + errText(res.e).replace(/^整理失敗：/, ""), "warn");
+      } else {
+        store(MODEL_STORE, res.model);
+        setStatus("✅ 金鑰可以用！（" + res.model + "）", "good");
+        setTimeout(closeDlg, 1200);
+      }
+      $("aiClear").hidden = false;
+      state.posts.forEach(function (p) { p.aiErr = ""; });
+      renderList();
+    });
   });
   $("aiClear").addEventListener("click", function () {
     store(KEY_STORE, null);
