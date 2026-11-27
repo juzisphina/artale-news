@@ -219,9 +219,10 @@ def main():
     changed = 0
     for p in fresh:
         prev = old.get(p["id"])
-        same = bool(prev) and prev["title"] == p["title"] and prev.get("v") == SCHEMA
+        same_title = bool(prev) and prev["title"] == p["title"]
+        same = same_title and prev.get("v") == SCHEMA
         wants_ai = (ai_budget > 0 and p["category"] not in NO_AI
-                    and not (same and prev.get("ai")))
+                    and not (same_title and prev.get("ai")))
         if same and prev.get("sections") is not None and not wants_ai:
             prev.update({k: p[k] for k in ("pinned", "label", "category", "date")})
             continue
@@ -230,7 +231,7 @@ def main():
             text = d.pop("text")
             p.update(d)
             p["v"] = SCHEMA
-            if same and prev.get("ai"):
+            if same_title and prev.get("ai"):  # a format re-fetch must not lose summaries
                 p["ai"] = prev["ai"]
             if wants_ai and text.strip():
                 ai_budget -= 1
